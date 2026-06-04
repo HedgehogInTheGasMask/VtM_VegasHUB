@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VtM — Персонажи</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: #050505;
+            font-family: 'Inter', sans-serif;
+            color: #fff;
+        }
+
+        /* === TOP SECTION (3 Panels) === */
+        .top-section {
+            display: flex;
+            height: 100vh;
+            width: 100%;
+            position: relative;
+        }
+
+        .panel {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            border-right: 1px solid rgba(255, 255, 255, 0.08);
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: flex 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .panel:last-child {
+            border-right: none;
+        }
+
+        .panel:hover {
+            flex: 1.3;
+        }
+
+        .panel-bg {
+            position: absolute;
+            inset: 0;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), filter 0.5s ease;
+            filter: brightness(0.4) saturate(0.7);
+            z-index: 0;
+        }
+
+        .panel:hover .panel-bg {
+            transform: scale(1.05);
+            filter: brightness(0.6) saturate(1);
+        }
+
+        .panel-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 40%, rgba(0,0,0,0.1) 60%, rgba(0,0,0,0.4) 100%);
+            z-index: 1;
+            transition: background 0.5s ease;
+        }
+
+        .panel:hover .panel-overlay {
+            background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.1) 40%, rgba(0,0,0,0.05) 60%, rgba(0,0,0,0.3) 100%);
+        }
+
+        .panel-content {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            height: 100%;
+            padding: 2rem 1.5rem;
+            text-align: center;
+            width: 100%;
+        }
+
+        .panel-number {
+            position: absolute;
+            top: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.65rem;
+            font-weight: 500;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.25);
+            transition: color 0.3s ease;
+        }
+
+        .panel:hover .panel-number {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .panel-title {
+            font-size: clamp(1.1rem, 2vw, 1.6rem);
+            font-weight: 600;
+            color: #fff;
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+            margin-bottom: 0.5rem;
+            transition: transform 0.4s ease, text-shadow 0.4s ease;
+        }
+
+        .panel:hover .panel-title {
+            transform: translateY(-4px);
+            text-shadow: 0 0 30px rgba(168, 85, 247, 0.4);
+        }
+
+        .panel-subtitle {
+            font-size: clamp(0.6rem, 1vw, 0.75rem);
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.35);
+            font-style: italic;
+            letter-spacing: 0.02em;
+            line-height: 1.4;
+            max-width: 90%;
+            transition: color 0.3s ease;
+        }
+
+        .panel:hover .panel-subtitle {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .panel-tag {
+            display: inline-block;
+            margin-top: 0.75rem;
+            padding: 0.3rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.6rem;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.03);
+            transition: all 0.3s ease;
+        }
+
+        .panel:hover .panel-tag {
+            border-color: rgba(168, 85, 247, 0.4);
+            color: rgba(168, 85, 247, 0.8);
+            background: rgba(168, 85, 247, 0.08);
+        }
+
+        .divider-line {
+            position: absolute;
+            right: 0;
+            top: 10%;
+            height: 80%;
+            width: 1px;
+            background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.08), transparent);
+            z-index: 3;
+        }
+
+        .corner-mark {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            z-index: 3;
+            opacity: 0.15;
+            transition: opacity 0.3s ease;
+        }
+
+        .panel:hover .corner-mark {
+            opacity: 0.4;
+        }
+
+        .corner-mark.tl { top: 1rem; left: 1rem; border-top: 1px solid #a855f7; border-left: 1px solid #a855f7; }
+        .corner-mark.tr { top: 1rem; right: 1rem; border-top: 1px solid #a855f7; border-right: 1px solid #a855f7; }
+        .corner-mark.bl { bottom: 1rem; left: 1rem; border-bottom: 1px solid #a855f7; border-left: 1px solid #a855f7; }
+        .corner-mark.br { bottom: 1rem; right: 1rem; border-bottom: 1px solid #a855f7; border-right: 1px solid #a855f7; }
+
+        @keyframes pulse {
+            50% { opacity: 0.5; }
+        }
+
+        .pulse-dot {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #a855f7;
+            z-index: 3;
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+            opacity: 0.5;
+        }
+
+        /* === BOTTOM SECTION (Big Token Card) === */
+        .bottom-section {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4rem 2rem;
+            position: relative;
+            background: radial-gradient(circle at bottom, rgba(168, 85, 247, 0.05), transparent 60%);
+        }
+
+        .hero-card {
+            display: block;
+            position: relative;
+            max-width: 1000px;
+            width: 100%;
+            border-radius: 1.5rem;
+            overflow: hidden;
+            box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05);
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.5s ease;
+            text-decoration: none;
+        }
+
+        .hero-card:hover {
+            transform: translateY(-8px) scale(1.01);
+            box-shadow: 0 25px 50px -12px rgba(168, 85, 247, 0.3), 0 0 0 1px rgba(168, 85, 247, 0.3);
+        }
+
+        .hero-image {
+            width: 100%;
+            height: auto;
+            display: block;
+            filter: brightness(0.6) saturate(0.8);
+            transition: filter 0.6s ease;
+        }
+
+        .hero-card:hover .hero-image {
+            filter: brightness(0.8) saturate(1);
+        }
+
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.2) 40%, transparent 100%);
+            z-index: 1;
+        }
+
+        .hero-content {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 3rem;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .hero-title {
+            font-size: clamp(2rem, 5vw, 4rem);
+            font-weight: 600;
+            color: #fff;
+            letter-spacing: -0.03em;
+            margin-bottom: 0.75rem;
+            transition: transform 0.4s ease, text-shadow 0.4s ease;
+        }
+
+        .hero-card:hover .hero-title {
+            transform: translateY(-5px);
+            text-shadow: 0 0 40px rgba(168, 85, 247, 0.6);
+        }
+
+        .hero-tag {
+            display: inline-block;
+            padding: 0.4rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.65rem;
+            font-weight: 500;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(4px);
+            transition: all 0.3s ease;
+        }
+
+        .hero-card:hover .hero-tag {
+            border-color: rgba(168, 85, 247, 0.5);
+            color: #a855f7;
+            background: rgba(168, 85, 247, 0.1);
+        }
+
+        /* Decorative corners for hero */
+        .hero-corner {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            z-index: 3;
+            opacity: 0.2;
+            transition: opacity 0.3s ease;
+        }
+
+        .hero-card:hover .hero-corner {
+            opacity: 0.6;
+        }
+
+        .hero-corner.tl { top: 1.5rem; left: 1.5rem; border-top: 2px solid #a855f7; border-left: 2px solid #a855f7; }
+        .hero-corner.tr { top: 1.5rem; right: 1.5rem; border-top: 2px solid #a855f7; border-right: 2px solid #a855f7; }
+        .hero-corner.bl { bottom: 1.5rem; left: 1.5rem; border-bottom: 2px solid #a855f7; border-left: 2px solid #a855f7; }
+        .hero-corner.br { bottom: 1.5rem; right: 1.5rem; border-bottom: 2px solid #a855f7; border-right: 2px solid #a855f7; }
+
+        /* Mobile adjustments */
+        @media (max-width: 768px) {
+            .top-section {
+                flex-direction: column;
+            }
+
+            .panel {
+                border-right: none;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            }
+
+            .panel:last-child {
+                border-bottom: none;
+            }
+
+            .panel:hover {
+                flex: 1.3;
+            }
+
+            .panel-bg {
+                background-size: cover;
+            }
+
+            .divider-line {
+                display: none;
+            }
+
+            .hero-content {
+                padding: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- TOP SECTION: 3 Panels -->
+<div class="top-section" id="top">
+
+    <!-- Panel 1: Эш Велей -->
+    <a href="https://hedgehoginthegasmask.github.io/kventa.ejatina/" target="_blank" class="panel">
+        <div class="panel-bg" style="background-image: url('https://z-cdn-media.chatglm.cn/files/9dbc82e7-e6e7-456f-a107-fa1316bc230f.png?auth_key=1880539436-c1c0b8208eed4ca8ac096ff396915d81-0-747972d66df59f99e835179a238a0a9f');"></div>
+        <div class="panel-overlay"></div>
+        <div class="corner-mark tl"></div>
+        <div class="corner-mark tr"></div>
+        <div class="corner-mark bl"></div>
+        <div class="corner-mark br"></div>
+        <div class="pulse-dot"></div>
+        <div class="panel-content">
+            <span class="panel-number">I</span>
+            <div class="panel-title">Эш Велей</div>
+            <div class="panel-subtitle">*Крайне нормисно и на 100% нанейрослоплено</div>
+            <span class="panel-tag">Квента · VtM v20</span>
+        </div>
+        <div class="divider-line"></div>
+    </a>
+
+    <!-- Panel 2: Alice SchizoReturns -->
+    <a href="https://chat.z.ai/space/h1uqm4jp1yb0-art" target="_blank" class="panel">
+        <div class="panel-bg" style="background-image: url('https://z-cdn-media.chatglm.cn/files/c9188d06-b93e-44a5-bd2f-970532bb3694.png?auth_key=1880539436-c24382ae09ae4d39b40710b0d05c3053-0-9620298c8da9959ab3392a65c12adc3e');"></div>
+        <div class="panel-overlay"></div>
+        <div class="corner-mark tl"></div>
+        <div class="corner-mark tr"></div>
+        <div class="corner-mark bl"></div>
+        <div class="corner-mark br"></div>
+        <div class="pulse-dot"></div>
+        <div class="panel-content">
+            <span class="panel-number">II</span>
+            <div class="panel-title">Alice SchizoReturns</div>
+            <span class="panel-tag">Квента · VtM v20</span>
+        </div>
+        <div class="divider-line"></div>
+    </a>
+
+    <!-- Panel 3: Предыстория Знакомства -->
+    <a href="https://hedgehoginthegasmask.github.io/istoriya.znakomstva/" target="_blank" class="panel">
+        <div class="panel-bg" style="background-image: url('https://z-cdn-media.chatglm.cn/files/3d507de8-dd15-460e-968d-5bb15092d8f6.png?auth_key=1880539550-5b8e31d1f0ce483394d0bd004d809887-0-237b8607046aea6e5ff464d6ad3e5f30');"></div>
+        <div class="panel-overlay"></div>
+        <div class="corner-mark tl"></div>
+        <div class="corner-mark tr"></div>
+        <div class="corner-mark bl"></div>
+        <div class="corner-mark br"></div>
+        <div class="pulse-dot"></div>
+        <div class="panel-content">
+            <span class="panel-number">III</span>
+            <div class="panel-title">Предыстория Знакомства</div>
+            <span class="panel-tag">Лор · История</span>
+        </div>
+    </a>
+
+</div>
+
+<!-- BOTTOM SECTION: Token Selection -->
+<section class="bottom-section" id="tokens">
+    <a href="https://chat.z.ai/space/g195x44t2k10-art" target="_blank" class="hero-card">
+        <img src="https://z-cdn-media.chatglm.cn/files/9aa3be65-9939-4a21-92cc-feb11f59b721.png?auth_key=1880542410-77cd4f49ae75404ba1a93898a6eb4ebf-0-20f3b13576e8596aa771f5362e273d55" alt="Выбор Токенов" class="hero-image">
+        <div class="hero-overlay"></div>
+        <div class="hero-corner tl"></div>
+        <div class="hero-corner tr"></div>
+        <div class="hero-corner bl"></div>
+        <div class="hero-corner br"></div>
+        <div class="hero-content">
+            <h2 class="hero-title">Выбор Токенов</h2>
+            <span class="hero-tag">Перейти к выбору</span>
+        </div>
+    </a>
+</section>
+
+<audio id="bgMusic" src="music.mp3" loop preload="auto"></audio>
+
+<script>
+const music = document.getElementById("bgMusic");
+
+music.volume = 0.8;
+
+let musicStarted = false;
+
+function startMusic() {
+    if (musicStarted) return;
+
+    music.play()
+        .then(() => {
+            musicStarted = true;
+        })
+        .catch(err => {
+            console.log("Музыка не запустилась:", err);
+        });
+}
+
+document.addEventListener("pointerdown", startMusic);
+
+document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+        music.pause();
+    } else {
+        if (musicStarted) {
+            music.play().catch(() => {});
+        }
+    }
+});
+</script>
+
+</body>
+</html>
